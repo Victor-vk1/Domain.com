@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Domain</title>
+
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        height: 100vh;
+        background: #000;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    }
+
+    /* Moving autumn sky clouds */
+    .sky {
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80')
+            center/cover no-repeat;
+        filter: blur(12px) brightness(0.8) saturate(1.1);
+        animation: moveClouds 40s linear infinite;
+    }
+
+    @keyframes moveClouds {
+        from { transform: translateX(0); }
+        to { transform: translateX(-20%); }
+    }
+
+    /* Level-3 Liquid Glass Card */
+    .glass {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 320px;
+        padding: 30px;
+        border-radius: 28px;
+        backdrop-filter: blur(25px) saturate(150%);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow:
+            inset 0 0 60px rgba(255,255,255,0.15),
+            0 20px 40px rgba(0,0,0,0.4),
+            0 0 12px rgba(0,255,255,0.6);  /* neon rim */
+        animation: floatBounce 5s ease-in-out infinite;
+        border: 1px solid rgba(255,255,255,0.25);
+        position: relative;
+    }
+
+    @keyframes floatBounce {
+        0%,100% { transform: translate(-50%, -52%); }
+        50% { transform: translate(-50%, -48%); }
+    }
+
+    /* Card reflection highlight */
+    .glass::before {
+        content:"";
+        position:absolute;
+        top:-40%; left:-40%;
+        width:180%; height:180%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), transparent 70%);
+        transform: rotate(20deg);
+    }
+
+    h2 {
+        color: white;
+        margin-top: 0;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 14px;
+        border: none;
+        outline: none;
+        backdrop-filter: blur(10px);
+        background: rgba(255,255,255,0.2);
+        color: white;
+        font-size: 1rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: none;
+        margin-top: 10px;
+        background: rgba(0, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        color: #000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: rgba(0, 255, 255, 0.7);
+    }
+
+    /* Ripple */
+    .ripple {
+        position: fixed;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        background: rgba(255,255,255,0.3);
+        animation: rippleEffect 0.6s linear forwards;
+    }
+
+    @keyframes rippleEffect {
+        from { width: 0; height: 0; opacity: 0.6; }
+        to { width: 300px; height: 300px; opacity: 0; }
+    }
+</style>
+</head>
+
+<body>
+<div class="sky"></div>
+
+<div class="glass" id="card">
+    <h2>Access Domains</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">Log In</button>
+</div>
+
+<script>
+/* ====== PARALLAX AUTO-TILT ====== */
+document.addEventListener("mousemove", e => {
+    const x = (window.innerWidth / 2 - e.clientX) / 30;
+    const y = (window.innerHeight / 2 - e.clientY) / 30;
+    document.getElementById("card").style.transform =
+        `translate(-50%, -50%) rotateX(${y}deg) rotateY(${x}deg)`;
+});
+
+/* ====== TAP RIPPLE ====== */
+document.addEventListener("click", e => {
+    const r = document.createElement("div");
+    r.className = "ripple";
+    r.style.left = e.clientX + "px";
+    r.style.top = e.clientY + "px";
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+});
+
+/* ====== LOGIN: GOOGLE SCRIPT URL (YOURS) ====== */
+const SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbyf-8LnQKKpIxzvY1QsVZI2jQF_7oMxprxCWrrFJTPDNBqrdZs_Folw4GZI2Iz5phM-_A/exec";
+
+function login() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    fetch(SCRIPT_URL + `?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect || "/domains.html";
+            } else {
+                alert("Invalid login");
+            }
+        })
+        .catch(err => alert("Error connecting to server."));
+}
+</script>
+</body>
+</html>
